@@ -22,7 +22,12 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-
+#include "display_LED.h"
+#include "fsm_automatic.h"
+#include "fsm_manual.h"
+#include "global.h"
+#include "input_reading.h"
+#include "software_timer.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -89,16 +94,40 @@ int main(void)
   MX_GPIO_Init();
   MX_TIM2_Init();
   /* USER CODE BEGIN 2 */
-
+  HAL_TIM_Base_Start_IT(&htim2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
+
+  //setup time to display traffic light
+  red_time = RED_TIME;
+  green_time = GREEN_TIME;
+  yellow_time = YELLOW_TIME;
+
+  // Initial status
+  status1 = INIT;
+  status2 = INIT;
+  status3 = -1;
+
+  // Reset counter of LEDs
+  count_down1 = 0; //counter for LED1s
+  count_down2 = 0; //counter for LED2s
+
+  //turn off all led
+  ClearAllLED();
+
+  //turn off LEDSEG
+  ClearLEDSEG();
+
   while (1)
   {
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	  fsm_automatic_run1();
+	  fsm_automatic_run2();
+	  fsm_manual_run();
   }
   /* USER CODE END 3 */
 }
@@ -178,7 +207,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
-
+  interrupt_cycle = ( int ) ((1+ htim2 . Init . Prescaler ) *(1+htim2 . Init . Period ) ) /8000;
   /* USER CODE END TIM2_Init 2 */
 
 }
@@ -240,7 +269,10 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
-
+void HAL_TIM_PeriodElapsedCallback(TIM_HandleTypeDef *htim) {
+	timerRun();
+	getKeyInput();
+}
 /* USER CODE END 4 */
 
 /**
