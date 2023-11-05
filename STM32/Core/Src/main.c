@@ -207,7 +207,7 @@ static void MX_TIM2_Init(void)
     Error_Handler();
   }
   /* USER CODE BEGIN TIM2_Init 2 */
-  interrupt_cycle = ( int ) ((1+ htim2 . Init . Prescaler ) *(1+htim2 . Init . Period ) ) /8000;
+
   /* USER CODE END TIM2_Init 2 */
 
 }
